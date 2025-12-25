@@ -1,6 +1,6 @@
 package com.company.steps;
 
-import com.company.apiHooks.APIHooks;
+import com.company.hooks.apiHooks.APIHooks;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.restassured.RestAssured;

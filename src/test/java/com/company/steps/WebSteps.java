@@ -8,7 +8,7 @@ import io.cucumber.java.en.Then;
 import org.testng.Assert;
 import org.openqa.selenium.WebDriver;
 
-public class SampleSteps {
+public class WebSteps {
 
     private WebDriver driver;
     private HomePage home;

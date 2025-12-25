@@ -6,7 +6,7 @@ import org.testng.annotations.Listeners;
 
 @CucumberOptions(
         features = "src/test/resources/features/web",
-        glue = {"com.company.steps", "com.company.webHooks", "com.company.config"},
+        glue = {"com.company.steps", "com.company.hooks.webHooks", "com.company.config"},
         plugin = {"pretty", "json:target/cucumber.json"}
 )
 @Listeners({com.company.listeners.ExtentTestNGListener.class, com.company.listeners.RetryListener.class})

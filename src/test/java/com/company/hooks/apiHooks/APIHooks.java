@@ -1,4 +1,4 @@
-package com.company.apiHooks;
+package com.company.hooks.apiHooks;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;

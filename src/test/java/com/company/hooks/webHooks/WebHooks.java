@@ -1,4 +1,4 @@
-package com.company.webHooks;
+package com.company.hooks.webHooks;
 
 import com.company.driver.DriverManager;
 import io.cucumber.java.After;
