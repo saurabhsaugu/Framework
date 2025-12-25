@@ -1,0 +1,40 @@
+# Maven
+/target/
+
+# IDEs
+/.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+
+# Test output
+/cucumber.json
+/extent-report.html
+
+# Temporary files
+*.tmp
+
+# Java
+/*.class
+
+# Dependency directories
+/.mvn/
+
+# Other
+.env
+
