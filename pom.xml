@@ -135,8 +135,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M8</version>
                 <configuration>
+                    <!-- Use testng.xml in project root by default. You can override via -Dsurefire.suiteXmlFiles=path/to/other.xml -->
                     <suiteXmlFiles>
-                        <!-- If using TestNG XML, list it here -->
+                        <suiteXmlFile>testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <includes>
                         <include>**/*Test.java</include>
