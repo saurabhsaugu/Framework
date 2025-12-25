@@ -30,5 +30,11 @@ public class WebSteps {
         System.out.println("Generated test data: " + randomName);
         Assert.assertTrue(actual.contains(expected), "Title did not contain expected text");
     }
-}
 
+    @Then("the message should displayed on the screen {string}")
+    public void messageShouldBeDisplayed(String expected) {
+        // Use PageObject's header message (initialized via PageFactory)
+        String body = home != null ? home.getHeaderMessage() : null;
+        Assert.assertTrue(body != null && body.contains(expected), "Expected message was not displayed on the screen");
+    }
+}

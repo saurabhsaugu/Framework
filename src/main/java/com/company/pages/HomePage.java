@@ -1,6 +1,13 @@
 package com.company.pages;
 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class HomePage {
     private final WebDriver driver;
@@ -8,6 +15,22 @@ public class HomePage {
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
+        PageFactory.initElements(driver, this);
+    }
+
+    // Initialized by PageFactory at runtime
+    @SuppressWarnings("unused")
+    @FindBy(xpath = "/html/body/div/h1")
+    private WebElement headerMessage;
+
+    public String getHeaderMessage() {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            wait.until(ExpectedConditions.visibilityOf(headerMessage));
+            return headerMessage != null ? headerMessage.getText() : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public void open() {
@@ -22,4 +45,3 @@ public class HomePage {
         return driver.getTitle();
     }
 }
-
