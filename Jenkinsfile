@@ -29,9 +29,22 @@ pipeline {
     }
     stage('Flaky Analysis') {
       steps {
+        // run verify which will also execute analytics via exec plugin (if configured)
         sh 'mvn -B verify -DskipTests'
-        sh 'mvn -B exec:java -Dexec.mainClass=com.company.analytics.FlakyAnalytics'
-        archiveArtifacts artifacts: 'target/flaky-summary.json', allowEmptyArchive: true
+      }
+      post {
+        always {
+          // Archive raw flaky log and generated reports
+          archiveArtifacts artifacts: 'target/flaky/**', allowEmptyArchive: true
+          // Publish HTML report (requires HTML Publisher plugin installed on Jenkins)
+          publishHTML([
+            reportDir: 'target/flaky',
+            reportFiles: 'flaky-report.html',
+            reportName: 'Flaky Tests Report',
+            keepAll: true,
+            alwaysLinkToLastBuild: true
+          ])
+        }
       }
     }
   }
@@ -41,4 +54,3 @@ pipeline {
     }
   }
 }
-
