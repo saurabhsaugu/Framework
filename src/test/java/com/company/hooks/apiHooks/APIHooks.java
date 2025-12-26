@@ -11,9 +11,18 @@ import io.restassured.RestAssured;
 
 public class APIHooks {
 
-    // Public specs for step classes to reuse
-    public static RequestSpecification requestSpec;
-    public static ResponseSpecification commonResponseSpec;
+    // ThreadLocal specs for parallel test execution
+    private static final ThreadLocal<RequestSpecification> requestSpec = new ThreadLocal<>();
+    private static final ThreadLocal<ResponseSpecification> commonResponseSpec = new ThreadLocal<>();
+
+    // Accessors for step classes
+    public static RequestSpecification getRequestSpec() {
+        return requestSpec.get();
+    }
+
+    public static ResponseSpecification getCommonResponseSpec() {
+        return commonResponseSpec.get();
+    }
 
     @Before
     public void beforeScenario() {
@@ -21,12 +30,12 @@ public class APIHooks {
         RequestSpecBuilder reqBuilder = new RequestSpecBuilder();
         reqBuilder.setBaseUri("https://jsonplaceholder.typicode.com");
         reqBuilder.setContentType("application/json; charset=UTF-8");
-        requestSpec = reqBuilder.build();
+        requestSpec.set(reqBuilder.build());
 
         // Common response expectations (content-type JSON). Status codes vary per test so not set here.
         ResponseSpecBuilder respBuilder = new ResponseSpecBuilder();
         respBuilder.expectContentType(ContentType.JSON);
-        commonResponseSpec = respBuilder.build();
+        commonResponseSpec.set(respBuilder.build());
 
         // Optional global RestAssured settings
         RestAssured.useRelaxedHTTPSValidation();
@@ -35,8 +44,8 @@ public class APIHooks {
     @After
     public void afterScenario() {
         // Clear any state if needed
-        requestSpec = null;
-        commonResponseSpec = null;
+        requestSpec.remove();
+        commonResponseSpec.remove();
     }
 
     // Helper to create a response spec for a specific expected status code

@@ -15,7 +15,7 @@ public class APISteps {
     public void i_get(String path) {
         response = RestAssured
                 .given()
-                .spec(APIHooks.requestSpec)
+                .spec(APIHooks.getRequestSpec())
                 .when()
                 .get(path)
                 .andReturn();
@@ -25,7 +25,7 @@ public class APISteps {
     public void i_post_with_body(String path, String body) {
         response = RestAssured
                 .given()
-                .spec(APIHooks.requestSpec)
+                .spec(APIHooks.getRequestSpec())
                 .body(body)
                 .when()
                 .post(path)
