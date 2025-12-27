@@ -5,7 +5,7 @@ Lightweight test automation framework combining Cucumber, TestNG, Selenium/Appiu
 Prerequisites
 - Java 17
 - Maven 3.6+
-- Network access for external API tests (jsonplaceholder.typicode.com used in example)
+- Network access for external API tests (jsonplaceholder.typicode.com used in examples)
 
 Structure (important folders)
 - src/test/resources/features - Cucumber feature files (api/ and web/)
@@ -13,44 +13,67 @@ Structure (important folders)
 - src/test/java/com/company/hooks - Cucumber hooks (including APIHooks)
 - src/test/java/com/company/runner - TestNG/Cucumber runner classes
 - src/test/java/com/company/listeners - TestNG listeners (RetryAnalyzer, RetryListener, Extent listener)
-- src/test/java/com/company/config - Cucumber + Spring test configuration
+- src/test/java/com/company/config - Cucumber + Spring test configuration and test-scoped factories
+- src/main/java/com/company/driver - DriverManager (thread-safe WebDriver handling)
 
-Key dependencies (from pom.xml)
-- Cucumber (cucumber-java, cucumber-testng, cucumber-spring)
-- TestNG
-- RestAssured (test scope)
-- Spring (spring-context, spring-test)
-- Selenium / Appium (for web/mobile tests)
-- JavaFaker, ExtentReports, WebDriverManager
+Key changes (recent)
+- Tests use Spring DI for test objects: a dedicated Cucumber Spring bootstrap (CucumberSpringConfiguration) wires test-scoped factories.
+- WebDriver isolation:
+  - DriverManager stores WebDriver in a ThreadLocal so each thread has its own instance.
+  - WebDriver is provided by a Scenario-scoped factory (WebDriverFactory) so each Cucumber scenario gets an isolated driver.
+  - ChromeOptions now use a per-thread user-data-dir and ephemeral DevTools port to reduce profile and port conflicts in parallel runs.
+- RestAssured isolation:
+  - APIRequestFactory builds a fresh RequestSpecification per scenario.
+  - APIHooks stores specs in ThreadLocal and clears them after each scenario.
+- Dependencies adjusted so Selenium/Appium and WebDriverManager are test-scoped. RestAssured is test-scoped.
+- SLF4J binding: project uses logback-classic to avoid "no binding" warnings and enable richer logging. logback-test.xml in test resources provides defaults.
 
 How to run
-- Default suite (testng.xml) is configured in the Maven Surefire plugin, so the simplest run is:
+- Default suite (testng.xml) is configured in the Maven Surefire plugin. Recommended run:
   - mvn test
-- To run a single TestNG/Cucumber runner class directly:
-  - mvn -Dtest=APITestNGRunner test
-  - Note: when you explicitly pick tests with -Dtest, Surefire will not use the suite Xml. Use the suite run (mvn test) to execute the testng.xml-defined suite.
-- To override the suite file from Maven, pass the Surefire property:
-  - mvn -Dsurefire.suiteXmlFiles=path/to/other-testng.xml test
+- To override the suite file from Maven:
+  - mvn -Dsurefire.suiteXmlFiles=path/to/testng.xml test
 - Compile tests only (no execution): mvn -DskipTests=true test-compile
+- To run a single TestNG runner via Surefire (recommended use suite for Cucumber):
+  - mvn -Dtest=APITestNGRunner test
+  - Note: using -Dtest bypasses suiteXmlFiles behaviour in some Surefire versions; prefer suite runs to pick up listeners and suite-level config.
 
-API testing notes
-- APIHooks sets up a RequestSpecification (baseUri, content-type) used by API step definitions. Consider converting APIHooks to a Spring-managed component for cleaner DI.
-- Use APIHooks.responseSpecFor(status) to validate expected response status + JSON content-type.
-- RestAssured is declared with test scope in pom.xml (available during test runs).
+Parallel execution
+- The code is prepared for parallel scenario execution, but you must enable concurrency in TestNG / Surefire:
+  - Configure parallel and thread-count in testng.xml (parallel="methods" or "tests"/"classes") or via Surefire/TestNG configuration.
+  - Verify thread-count against machine resources; run small thread counts first.
+- Checklist before enabling parallelism:
+  - No static mutable state used by tests; convert to ScenarioScope or ThreadLocal if present.
+  - Healenium or proxies disabled unless verified thread-safe (-Dhealenium.enabled=true to enable).
+  - Per-thread chrome profile folders are cleaned after quit to avoid disk exhaustion.
+  - Avoid changing RestAssured global static config at runtime; use per-scenario RequestSpecifications.
 
-Cucumber + Spring
-- cucumber-spring is included and a test CucumberSpringConfiguration is present to bootstrap Spring for Cucumber scenarios. Step definitions can @Autowired Spring beans (demonstrated by injecting Faker into APISteps).
+Troubleshooting common issues
+- mvn test doesn't pick up runners / testng.xml
+  - Surefire is configured with a default suiteXmlFiles entry. Overriding with -Dsurefire.suiteXmlFiles=... should work; ensure you are not using -Dtest concurrently.
+- Cucumber + Spring duplicate bootstrap errors
+  - Ensure only one class is annotated with @CucumberContextConfiguration on the glue path. Use cucumber.glue property in src/test/resources/cucumber.properties to restrict glue scanning.
+- RestAssured MissingMethodException / proxy merge issues
+  - Do not pass proxied beans into RestAssured; build concrete RequestSpecification objects per scenario (APIRequestFactory) and store them in ThreadLocal (APIHooks) before using RestAssured.given().spec(...).
+- WebSocket / "Connection reset" warnings from Selenium/ChromeDevTools
+  - Causes: browser crash, profile conflict, DevTools port conflict, resource exhaustion, proxies, or version mismatch among Chrome/ChromeDriver/Selenium.
+  - Mitigations in the project: per-thread user-data-dir, remote-debugging-port=0, flags to reduce background throttling. Additional steps:
+    - Verify Chrome and chromedriver versions match.
+    - Run single-threaded to reproduce; if stable, incrementally increase concurrency.
+    - Capture ChromeDriver and browser logs; inspect for OOM/crash messages.
+    - Disable Healenium/proxies to rule out middlemen.
+    - Ensure adequate CPU/memory/disk on CI runners.
 
-Retry behavior
-- RetryAnalyzer and RetryListener are provided. The Surefire-run suite (testng.xml) registers listeners; RetryListener also attempts to attach the analyzer at runtime to Cucumber-generated methods so retries work when running runners directly.
+Logging
+- logback-test.xml in src/test/resources configures logging for test runs. Project uses logback-classic as SLF4J binding to suppress warnings about missing bindings and provide richer logs.
 
-Thread-safety and parallelism
-- APIHooks currently exposes static RequestSpecification/ResponseSpecification. If you plan to run scenarios in parallel, convert specs to ThreadLocal or make APIHooks a Spring @Component and provide per-scenario instances.
+Healenium
+- Healenium support is optional and controlled via -Dhealenium.enabled=true and presence of the dependency on the test classpath. Default is disabled to keep tests stable by default.
 
-Troubleshooting
-- If Cucumber steps can't find a step definition, ensure the runner glue includes the package containing the steps and config classes.
-- If DI doesn't work, confirm cucumber-spring is on the test classpath and CucumberSpringConfiguration is on the glue path.
-- If retries aren't being applied, run with the suite (mvn test) or enable the runtime attachment logic in RetryListener (already implemented in listener but may depend on TestNG/Surefire versions).
+Recommendations
+- Before enabling high-concurrency runs, run the full suite with a small thread-count and inspect for WebSocket resets or flaky failures.
+- Add cleanup of per-thread browser profile directories if running thousands of parallel sessions.
+- Address security scan warnings in pom.xml if you plan to publish artifacts.
 
 Contact
 - Repository owner / maintainer: com.company (adjust as appropriate)
