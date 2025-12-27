@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"com.company"})
-public class WebFactory {
+public class WebDriverFactory {
 
     // Provide a WebDriver bean using the existing DriverManager initialization logic.
     // This allows Cucumber + Spring to inject WebDriver into step classes.
