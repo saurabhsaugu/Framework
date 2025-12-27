@@ -74,6 +74,24 @@ public class DriverManager {
                         if (Boolean.parseBoolean(System.getProperty("headless", "false"))) {
                             options.addArguments("--headless=new");
                         }
+                        // Use a unique user data dir per thread to avoid profile lock conflicts when running parallel browsers
+                        try {
+                            String tmp = System.getProperty("java.io.tmpdir");
+                            String profile = tmp + System.getProperty("file.separator") + "chrome-profile-" + Thread.currentThread().getId();
+                            options.addArguments("--user-data-dir=" + profile);
+                        } catch (Exception ignored) { }
+
+                        // Let Chrome pick an ephemeral remote debugging port to avoid port conflicts
+                        options.addArguments("--remote-debugging-port=0");
+
+                        // Disable background throttling which can cause renderer to pause and trigger unexpected disconnects
+                        options.addArguments("--disable-background-timer-throttling");
+                        options.addArguments("--disable-renderer-backgrounding");
+                        options.addArguments("--disable-backgrounding-occluded-windows");
+
+                        // Reduce automation banner and potential interference
+                        options.setExperimentalOption("excludeSwitches", java.util.Arrays.asList("enable-automation"));
+
                         wd = new ChromeDriver(options);
                         break;
                 }
