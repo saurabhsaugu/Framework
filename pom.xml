@@ -91,6 +91,13 @@
         </dependency>
 
         <!-- Healenium (self-healing) - placeholder version -->
+        <dependency>
+            <groupId>com.epam.healenium</groupId>
+            <artifactId>healenium-web</artifactId>
+            <version>3.5.7</version>
+            <scope>test</scope>
+            <!-- If this version doesn't exist in your environment, update to the correct Healenium artifact/version used by your project -->
+        </dependency>
         <!-- Healenium removed from compile-time dependencies; DriverManager will attempt to load it at runtime if present -->
 
         <!-- WebDriverManager for automatic driver management -->
@@ -139,8 +146,11 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <!-- Include both traditional *Test classes and TestNG runner classes so tests are discovered
+                         even when suites are not provided. This avoids relying solely on testng.xml. -->
                     <includes>
                         <include>**/*Test.java</include>
+                        <include>**/*Runner.java</include>
                     </includes>
                 </configuration>
             </plugin>
