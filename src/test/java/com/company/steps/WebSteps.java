@@ -1,23 +1,27 @@
 package com.company.steps;
 
-import com.company.driver.DriverManager;
 import com.company.pages.HomePage;
 import com.github.javafaker.Faker;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.testng.Assert;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Autowired;
+import io.cucumber.spring.ScenarioScope;
 
+@ScenarioScope
 public class WebSteps {
 
+    @Autowired
     private WebDriver driver;
+
     private HomePage home;
-    private final Faker faker = new Faker();
+
+    @Autowired
+    private Faker faker;
 
     @Given("I open the application")
     public void openApplication() {
-        DriverManager.initDriver("web");
-        driver = DriverManager.getDriver();
         home = new HomePage(driver);
         home.open("https://example.com");
     }
