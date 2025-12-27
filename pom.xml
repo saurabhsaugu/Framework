@@ -150,8 +150,11 @@
                     <groupId>org.seleniumhq.selenium</groupId>
                     <artifactId>selenium-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
             </exclusions>
-            <!-- If this version doesn't exist in your environment, update to the correct Healenium artifact/version used by your project -->
         </dependency>
         <!-- Healenium removed from compile-time dependencies; DriverManager will attempt to load it at runtime if present -->
 
@@ -177,14 +180,26 @@
                     <groupId>org.seleniumhq.selenium</groupId>
                     <artifactId>selenium-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
         <!-- Logging -->
+        <!-- Use Logback as the SLF4J implementation for richer logging -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.11</version>
+        </dependency>
+
+        <!-- Keep the commons-logging to SLF4J bridge so libraries using commons-logging are routed to SLF4J -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.36</version>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>2.0.7</version>
         </dependency>
 
         <!-- Gson for analytics/serialization -->
@@ -227,12 +242,6 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-                    <!-- Include both traditional *Test classes and TestNG runner classes so tests are discovered
-                         even when suites are not provided. This avoids relying solely on testng.xml. -->
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*Runner.java</include>
-                    </includes>
                 </configuration>
             </plugin>
 
