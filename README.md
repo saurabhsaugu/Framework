@@ -38,6 +38,28 @@ How to run
   - mvn -Dtest=APITestNGRunner test
   - Note: using -Dtest bypasses suiteXmlFiles behaviour in some Surefire versions; prefer suite runs to pick up listeners and suite-level config.
 
+Driver selection (web vs mobile)
+- The framework uses a unified `WebDriverFactory` that supports both desktop web and mobile runs. Select the target at runtime using either a JVM system property or an environment variable:
+  - System property (preferred for Maven runs): `-DdriverType=mobile` or `-DdriverType=web`
+  - Environment variable (CI-friendly): `DRIVER_TYPE=mobile` or `DRIVER_TYPE=web`
+- Examples (PowerShell):
+  - Web (headless Chrome):
+
+    mvn test -DdriverType=web -Dbrowser=chrome -Dheadless=true
+
+  - Mobile (Appium remote, native or mobile-web):
+
+    mvn test -DdriverType=mobile -Dappium.server=http://127.0.0.1:4723/wd/hub -DplatformName=Android -DdeviceName=emulator-5554
+
+- Notes:
+  - `DriverManager.initDriver(String)` still controls the details for mobile vs web; the factory simply passes the selected type to DriverManager.
+  - For native mobile app runs provide `-DappPackage` and `-DappActivity` (or other Appium capabilities) as needed.
+  - Unknown `driverType` values fall back to the web path; consider setting `-DdriverType` explicitly in CI to avoid surprises.
+
+Compatibility / migration notes
+- The previous `MobileDriverFactory` class is present as a deprecated compatibility shim. The unified `WebDriverFactory` is the recommended entrypoint.
+- `MobileWebSteps` and `WebSteps` now use the same pattern: they receive an injected `WebDriver` (scenario-scoped) and use page objects (e.g., `HomePage`) instead of starting/stopping drivers directly.
+
 Parallel execution
 - The code is prepared for parallel scenario execution, but you must enable concurrency in TestNG / Surefire:
   - Configure parallel and thread-count in testng.xml (parallel="methods" or "tests"/"classes") or via Surefire/TestNG configuration.

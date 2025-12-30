@@ -240,7 +240,7 @@
                 <configuration>
                     <!-- Use testng.xml in project root by default. You can override via -Dsurefire.suiteXmlFiles=path/to/other.xml -->
                     <suiteXmlFiles>
-                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                        <suiteXmlFile>testng-cucumber-web.xml</suiteXmlFile>
                     </suiteXmlFiles>
                 </configuration>
             </plugin>

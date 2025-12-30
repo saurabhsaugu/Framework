@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="QE Framework Suite" parallel="false">
+    <listeners>
+        <listener class-name="com.company.listeners.ExtentTestNGListener"/>
+        <listener class-name="com.company.listeners.RetryListener"/>
+    </listeners>
+    <test name="CucumberWebTests">
+        <classes>
+            <class name="com.company.runner.WebTestNGRunner"/>
+        </classes>
+    </test>
+</suite>
