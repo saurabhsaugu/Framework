@@ -16,26 +16,26 @@ public class MobileCapabilityFactory {
                 caps.setCapability("appium:automationName", getConfig("mobile.android.automationName", "UiAutomator2"));
                 caps.setCapability("browserName", getConfig("mobile.android.browserName", "Chrome"));
 
-//                // chromedriver autodownload and executable directory
-//                boolean chromedriverAutodownload = Boolean.parseBoolean(getConfig("appium.chromedriver.autodownload", "true"));
-//                caps.setCapability("appium:chromedriverAutodownload", chromedriverAutodownload);
-//                caps.setCapability("chromedriverAutodownload", chromedriverAutodownload);
-//
-//                String defaultTmp = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "appium-chromedrivers";
-//                String chromeDir = getConfig("appium.chromedriver.dir", defaultTmp);
-//                caps.setCapability("appium:chromedriverExecutableDir", chromeDir);
-//                caps.setCapability("chromedriverExecutableDir", chromeDir);
-//
-//                // Allow overriding chromedriver executable via PropertyConfig (system property or properties file)
-//                String explicitChromedriver = getConfig("appium.chromedriver.path", "");
-//                if ((explicitChromedriver == null || explicitChromedriver.isEmpty())) {
-//                    // fallback to environment variable if PropertyConfig doesn't have it
-//                    explicitChromedriver = System.getenv("APPIUM_CHROMEDRIVER");
-//                }
-//                if (explicitChromedriver != null && !explicitChromedriver.isEmpty()) {
-//                    caps.setCapability("appium:chromedriverExecutable", explicitChromedriver);
-//                    caps.setCapability("chromedriverExecutable", explicitChromedriver);
-//                }
+                // chromedriver autodownload and executable directory
+                boolean chromedriverAutodownload = Boolean.parseBoolean(getConfig("appium.chromedriver.autodownload", "true"));
+                caps.setCapability("appium:chromedriverAutodownload", chromedriverAutodownload);
+                caps.setCapability("chromedriverAutodownload", chromedriverAutodownload);
+
+                String defaultTmp = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "appium-chromedrivers";
+                String chromeDir = getConfig("appium.chromedriver.dir", defaultTmp);
+                caps.setCapability("appium:chromedriverExecutableDir", chromeDir);
+                caps.setCapability("chromedriverExecutableDir", chromeDir);
+
+                // Allow overriding chromedriver executable via PropertyConfig (system property or properties file)
+                String explicitChromedriver = getConfig("appium.chromedriver.path", "");
+                if ((explicitChromedriver == null || explicitChromedriver.isEmpty())) {
+                    // fallback to environment variable if PropertyConfig doesn't have it
+                    explicitChromedriver = System.getenv("APPIUM_CHROMEDRIVER");
+                }
+                if (explicitChromedriver != null && !explicitChromedriver.isEmpty()) {
+                    caps.setCapability("appium:chromedriverExecutable", explicitChromedriver);
+                    caps.setCapability("chromedriverExecutable", explicitChromedriver);
+                }
             } else {
                 // Native App
                 caps.setCapability("platformName", "Android");

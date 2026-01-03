@@ -6,6 +6,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -268,144 +269,144 @@ public class DriverManager {
     private static AppiumDriver createLocalMobileDriver(String platform) {
         DesiredCapabilities caps = MobileCapabilityFactory.getLocalCapabilities(platform, "web");
         // Ensure chromedriverExecutableDir exists so Appium can download chromedrivers into it
-//        Object dirObj = caps.getCapability("appium:chromedriverExecutableDir");
-//        if (dirObj == null) dirObj = caps.getCapability("chromedriverExecutableDir");
-//        if (dirObj != null) {
-//            try {
-//                File dir = new File(dirObj.toString());
-//                if (!dir.exists()) {
-//                    boolean created = dir.mkdirs();
-//                    if (!created) {
-//                        System.out.println("[DriverManager] Warning: could not create chromedriver dir: " + dir.getAbsolutePath());
-//                    }
-//                }
-//            } catch (Throwable t) {
-//                System.out.println("[DriverManager] Warning: error ensuring chromedriver dir exists: " + t.getMessage());
-//            }
-//        }
-//
-//        // If Appium cannot autodownload chromedriver, try to provision a matching chromedriver locally
-//        try {
-//            if (isAdbDeviceConnected()) {
-//                String chromeVersion = getChromeVersionFromDevice();
-//                if (chromeVersion != null) {
-//                    String major = chromeVersion.split("\\.")[0];
-//                    try {
-//                        System.out.println("[DriverManager] Detected Chrome on device: " + chromeVersion + " -> attempting to download matching chromedriver (major=" + major + ") locally via WebDriverManager");
-//                        io.github.bonigarcia.wdm.WebDriverManager.chromedriver().browserVersion(major).setup();
-//                        String localDriver = System.getProperty("webdriver.chrome.driver");
-//                        System.out.println("[DriverManager] WebDriverManager set webdriver.chrome.driver=" + localDriver);
-//                        if (localDriver != null && !localDriver.isEmpty()) {
-//                            File src = new File(localDriver);
-//                            if (src.exists()) {
-//                                // If a chromedriverExecutableDir is set in caps, copy the downloaded binary there so Appium can use it
-//                                Object targetDirObj = caps.getCapability("appium:chromedriverExecutableDir");
-//                                if (targetDirObj == null) targetDirObj = caps.getCapability("chromedriverExecutableDir");
-//                                if (targetDirObj != null) {
-//                                    try {
-//                                        File targetDir = new File(targetDirObj.toString());
-//                                        if (!targetDir.exists()) targetDir.mkdirs();
-//                                        File dest = new File(targetDir, src.getName());
-//                                        if (!dest.exists()) {
-//                                            java.nio.file.Files.copy(src.toPath(), dest.toPath());
-//                                            dest.setExecutable(true);
-//                                        }
-//                                        caps.setCapability("appium:chromedriverExecutable", dest.getAbsolutePath());
-//                                        caps.setCapability("chromedriverExecutable", dest.getAbsolutePath());
-//                                        System.out.println("[DriverManager] Copied chromedriver to: " + dest.getAbsolutePath());
-//                                    } catch (Throwable cpy) {
-//                                        System.out.println("[DriverManager] Failed to copy chromedriver to chromedriverExecutableDir: " + cpy.getMessage());
-//                                        // fallback to using original local path if copy failed
-//                                        caps.setCapability("appium:chromedriverExecutable", src.getAbsolutePath());
-//                                        caps.setCapability("chromedriverExecutable", src.getAbsolutePath());
-//                                    }
-//                                } else {
-//                                    caps.setCapability("appium:chromedriverExecutable", src.getAbsolutePath());
-//                                    caps.setCapability("chromedriverExecutable", src.getAbsolutePath());
-//                                }
-//                                System.out.println("[DriverManager] Using local chromedriver (exists): " + src.getAbsolutePath() + " (size=" + src.length() + ")");
-//                            } else {
-//                                System.out.println("[DriverManager] webdriver.chrome.driver was set but file not found: " + localDriver);
-//                            }
-//                        }
-//                    } catch (Throwable wdm) {
-//                        System.out.println("[DriverManager] Failed to download local chromedriver via WebDriverManager: " + wdm.getMessage());
-//                    }
-//                } else {
-//                    System.out.println("[DriverManager] Could not determine Chrome version on device via adb. Skipping local chromedriver provision.");
-//                }
-//            } else {
-//                System.out.println("[DriverManager] No adb device connected; skipping local chromedriver provision.");
-//            }
-//        } catch (Throwable t) {
-//            System.out.println("[DriverManager] Error while attempting local chromedriver provisioning: " + t.getMessage());
-//        }
-//
-//        // Probe Appium status to provide clearer diagnostics if Appium can't start a session
-//        String appiumBase = "http://127.0.0.1:4723/";
-//        String status = probeAppiumStatus(appiumBase, 2000);
-//        if (!"ready".equals(status)) {
-//            System.out.println("[DriverManager] Appium status: " + status + " (proceeding to attempt session)");
-//        }
-//
-//        // Log capabilities for debugging (helps diagnose chromedriver issues)
-//        try {
-//            System.out.println("[DriverManager] Creating Appium session at: " + appiumBase);
-//            System.out.println("[DriverManager] Capabilities: " + caps.asMap());
-//        } catch (Throwable ignored) { }
-//
-//        // Extra diagnostics: check chromedriverExecutable and directory contents so troubleshooting is easier
-//        try {
-//            Object exe = caps.getCapability("appium:chromedriverExecutable");
-//            if (exe == null) exe = caps.getCapability("chromedriverExecutable");
-//            Object exeDir = caps.getCapability("appium:chromedriverExecutableDir");
-//            if (exeDir == null) exeDir = caps.getCapability("chromedriverExecutableDir");
-//
-//            System.out.println("[DriverManager] appium:chromedriverExecutable=" + exe);
-//            System.out.println("[DriverManager] appium:chromedriverExecutableDir=" + exeDir);
-//
-//            if (exe != null) {
-//                try {
-//                    File f = new File(exe.toString());
-//                    System.out.println("[DriverManager] chromedriver file exists=" + f.exists() + ", path=" + f.getAbsolutePath() + ", size=" + (f.exists() ? f.length() : 0));
-//                } catch (Throwable t) {
-//                    System.out.println("[DriverManager] Error while checking chromedriver file: " + t.getMessage());
-//                }
-//            }
-//
-//            if (exeDir != null) {
-//                try {
-//                    File d = new File(exeDir.toString());
-//                    if (d.exists() && d.isDirectory()) {
-//                        System.out.println("[DriverManager] Listing chromedriverExecutableDir (" + d.getAbsolutePath() + "): ");
-//                        java.nio.file.Files.list(d.toPath()).forEach(p -> System.out.println("  - " + p.getFileName() + " (size=" + p.toFile().length() + ")"));
-//                    } else {
-//                        System.out.println("[DriverManager] chromedriverExecutableDir does not exist: " + d.getAbsolutePath());
-//                    }
-//                } catch (Throwable t) {
-//                    System.out.println("[DriverManager] Error while listing chromedriverExecutableDir: " + t.getMessage());
-//                }
-//            }
-//        } catch (Throwable ignored) { }
+        Object dirObj = caps.getCapability("appium:chromedriverExecutableDir");
+        if (dirObj == null) dirObj = caps.getCapability("chromedriverExecutableDir");
+        if (dirObj != null) {
+            try {
+                File dir = new File(dirObj.toString());
+                if (!dir.exists()) {
+                    boolean created = dir.mkdirs();
+                    if (!created) {
+                        System.out.println("[DriverManager] Warning: could not create chromedriver dir: " + dir.getAbsolutePath());
+                    }
+                }
+            } catch (Throwable t) {
+                System.out.println("[DriverManager] Warning: error ensuring chromedriver dir exists: " + t.getMessage());
+            }
+        }
 
+        // If Appium cannot autodownload chromedriver, try to provision a matching chromedriver locally
+        try {
+            if (isAdbDeviceConnected()) {
+                String chromeVersion = getChromeVersionFromDevice();
+                if (chromeVersion != null) {
+                    String major = chromeVersion.split("\\.")[0];
+                    try {
+                        System.out.println("[DriverManager] Detected Chrome on device: " + chromeVersion + " -> attempting to download matching chromedriver (major=" + major + ") locally via WebDriverManager");
+                        io.github.bonigarcia.wdm.WebDriverManager.chromedriver().browserVersion(major).setup();
+                        String localDriver = System.getProperty("webdriver.chrome.driver");
+                        System.out.println("[DriverManager] WebDriverManager set webdriver.chrome.driver=" + localDriver);
+                        if (localDriver != null && !localDriver.isEmpty()) {
+                            File src = new File(localDriver);
+                            if (src.exists()) {
+                                // If a chromedriverExecutableDir is set in caps, copy the downloaded binary there so Appium can use it
+                                Object targetDirObj = caps.getCapability("appium:chromedriverExecutableDir");
+                                if (targetDirObj == null) targetDirObj = caps.getCapability("chromedriverExecutableDir");
+                                if (targetDirObj != null) {
+                                    try {
+                                        File targetDir = new File(targetDirObj.toString());
+                                        if (!targetDir.exists()) targetDir.mkdirs();
+                                        File dest = new File(targetDir, src.getName());
+                                        if (!dest.exists()) {
+                                            java.nio.file.Files.copy(src.toPath(), dest.toPath());
+                                            dest.setExecutable(true);
+                                        }
+                                        caps.setCapability("appium:chromedriverExecutable", dest.getAbsolutePath());
+                                        caps.setCapability("chromedriverExecutable", dest.getAbsolutePath());
+                                        System.out.println("[DriverManager] Copied chromedriver to: " + dest.getAbsolutePath());
+                                    } catch (Throwable cpy) {
+                                        System.out.println("[DriverManager] Failed to copy chromedriver to chromedriverExecutableDir: " + cpy.getMessage());
+                                        // fallback to using original local path if copy failed
+                                        caps.setCapability("appium:chromedriverExecutable", src.getAbsolutePath());
+                                        caps.setCapability("chromedriverExecutable", src.getAbsolutePath());
+                                    }
+                                } else {
+                                    caps.setCapability("appium:chromedriverExecutable", src.getAbsolutePath());
+                                    caps.setCapability("chromedriverExecutable", src.getAbsolutePath());
+                                }
+                                System.out.println("[DriverManager] Using local chromedriver (exists): " + src.getAbsolutePath() + " (size=" + src.length() + ")");
+                            } else {
+                                System.out.println("[DriverManager] webdriver.chrome.driver was set but file not found: " + localDriver);
+                            }
+                        }
+                    } catch (Throwable wdm) {
+                        System.out.println("[DriverManager] Failed to download local chromedriver via WebDriverManager: " + wdm.getMessage());
+                    }
+                } else {
+                    System.out.println("[DriverManager] Could not determine Chrome version on device via adb. Skipping local chromedriver provision.");
+                }
+            } else {
+                System.out.println("[DriverManager] No adb device connected; skipping local chromedriver provision.");
+            }
+        } catch (Throwable t) {
+            System.out.println("[DriverManager] Error while attempting local chromedriver provisioning: " + t.getMessage());
+        }
+
+        // Probe Appium status to provide clearer diagnostics if Appium can't start a session
         String appiumBase = getConfig("appium.server", "http://127.0.0.1:4723");
+        String status = probeAppiumStatus(appiumBase, 2000);
+        if (!"ready".equals(status)) {
+            System.out.println("[DriverManager] Appium status: " + status + " (proceeding to attempt session)");
+        }
+
+        // Log capabilities for debugging (helps diagnose chromedriver issues)
+        try {
+            System.out.println("[DriverManager] Creating Appium session at: " + appiumBase);
+            System.out.println("[DriverManager] Capabilities: " + caps.asMap());
+        } catch (Throwable ignored) { }
+
+        // Extra diagnostics: check chromedriverExecutable and directory contents so troubleshooting is easier
+        try {
+            Object exe = caps.getCapability("appium:chromedriverExecutable");
+            if (exe == null) exe = caps.getCapability("chromedriverExecutable");
+            Object exeDir = caps.getCapability("appium:chromedriverExecutableDir");
+            if (exeDir == null) exeDir = caps.getCapability("chromedriverExecutableDir");
+
+            System.out.println("[DriverManager] appium:chromedriverExecutable=" + exe);
+            System.out.println("[DriverManager] appium:chromedriverExecutableDir=" + exeDir);
+
+            if (exe != null) {
+                try {
+                    File f = new File(exe.toString());
+                    System.out.println("[DriverManager] chromedriver file exists=" + f.exists() + ", path=" + f.getAbsolutePath() + ", size=" + (f.exists() ? f.length() : 0));
+                } catch (Throwable t) {
+                    System.out.println("[DriverManager] Error while checking chromedriver file: " + t.getMessage());
+                }
+            }
+
+            if (exeDir != null) {
+                try {
+                    File d = new File(exeDir.toString());
+                    if (d.exists() && d.isDirectory()) {
+                        System.out.println("[DriverManager] Listing chromedriverExecutableDir (" + d.getAbsolutePath() + "): ");
+                        java.nio.file.Files.list(d.toPath()).forEach(p -> System.out.println("  - " + p.getFileName() + " (size=" + p.toFile().length() + ")"));
+                    } else {
+                        System.out.println("[DriverManager] chromedriverExecutableDir does not exist: " + d.getAbsolutePath());
+                    }
+                } catch (Throwable t) {
+                    System.out.println("[DriverManager] Error while listing chromedriverExecutableDir: " + t.getMessage());
+                }
+            }
+        } catch (Throwable ignored) { }
+
+
         try {
             System.out.println("[DriverManager] Creating Appium session at: " + appiumBase);
             return new AppiumDriver(new URL(appiumBase), caps);
         } catch (Exception sessionEx) {
             System.out.println("[DriverManager] Failed to create Appium session: " + sessionEx.getClass().getName() + ": " + sessionEx.getMessage());
-//            try {
-//                String statusDetail = probeAppiumStatus(appiumBase, 2000);
-//                System.out.println("[DriverManager] Appium /status: " + statusDetail);
-//            } catch (Throwable t) { System.out.println("[DriverManager] Error probing Appium /status: " + t.getMessage()); }
-//
-//            try {
-//                String sessions = fetchAppiumSessions(appiumBase, 2000);
-//                System.out.println("[DriverManager] Appium /sessions response: " + sessions);
-//            } catch (Throwable t) { System.out.println("[DriverManager] Error fetching Appium /sessions: " + t.getMessage()); }
-//
-//            // Provide guidance for common chromedriver failures
-//            System.out.println("[DriverManager] Diagnostic hints: \n  - Verify Appium server logs for chromedriver download/match errors.\n  - Ensure Appium has network & write permission to chromedriverExecutableDir.\n  - If using Appium 2.x, ensure the appium-chromedriver driver/plugin is installed and enabled.\n  - As a fallback, pre-download a chromedriver matching device Chrome and set appium:chromedriverExecutable capability.\n");
+            try {
+                String statusDetail = probeAppiumStatus(appiumBase, 2000);
+                System.out.println("[DriverManager] Appium /status: " + statusDetail);
+            } catch (Throwable t) { System.out.println("[DriverManager] Error probing Appium /status: " + t.getMessage()); }
+
+            try {
+                String sessions = fetchAppiumSessions(appiumBase, 2000);
+                System.out.println("[DriverManager] Appium /sessions response: " + sessions);
+            } catch (Throwable t) { System.out.println("[DriverManager] Error fetching Appium /sessions: " + t.getMessage()); }
+
+            // Provide guidance for common chromedriver failures
+            System.out.println("[DriverManager] Diagnostic hints: \n  - Verify Appium server logs for chromedriver download/match errors.\n  - Ensure Appium has network & write permission to chromedriverExecutableDir.\n  - If using Appium 2.x, ensure the appium-chromedriver driver/plugin is installed and enabled.\n  - As a fallback, pre-download a chromedriver matching device Chrome and set appium:chromedriverExecutable capability.\n");
 
             throw new RuntimeException("Failed to create Appium session. See logs above for diagnostics.", sessionEx);
         }
